@@ -2,6 +2,19 @@ from dotenv import load_dotenv
 import requests
 import os
 from random import randint
+import logging
+from urllib.error import HTTPError
+
+
+class VkApiError(Exception):
+    pass
+    
+    
+def check_for_error_in_response(response):
+    response.raise_for_status()
+    answer = response.json()
+    if "error" in answer:
+        raise VkApiError("Invalid access token")
 
 
 def get_total_comics():
@@ -33,6 +46,7 @@ def get_address_for_upload_img(vk_token, vk_group_id):
     }
     response = requests.get(photos_wall_url, params=params)
     response.raise_for_status()
+    check_for_error_in_response(response)
     return response.json()["response"]["upload_url"]
 
 
@@ -41,6 +55,7 @@ def upload_img_to_server(upload_url):
         files = {"photo": img_path}
         response = requests.post(upload_url, files=files)
     response.raise_for_status()
+    check_for_error_in_response(response)
     upload_url_response = response.json()
     return upload_url_response["server"], upload_url_response["photo"], upload_url_response["hash"] 
 
@@ -57,6 +72,7 @@ def save_img_to_vk(vk_token, vk_group_id, server, photo_url, img_hash):
     }
     response = requests.post(photos_save_url, params=params)
     response.raise_for_status()
+    check_for_error_in_response(response)
     save_photos_response = response.json()    
     return save_photos_response["response"][0]["owner_id"], save_photos_response["response"][0]["id"]
 
@@ -72,10 +88,12 @@ def make_wall_post_vk(vk_token, vk_group_id, owner_id, photo_id, comic_commentar
         "attachments": f"photo{owner_id}_{photo_id}",
     }
     response = requests.post(wall_post_url, params=params)
-    return response.raise_for_status()
+    response.raise_for_status()
+    check_for_error_in_response(response)
+    return response.json()["response"]["post_id"]
     
 
-if __name__ == "__main__":
+def main():
     load_dotenv()
     vk_token = os.getenv("VK_TOKEN")
     vk_group_id = os.getenv("VK_GROUP_ID")
@@ -86,5 +104,12 @@ if __name__ == "__main__":
         server, photo_url, img_hash = upload_img_to_server(upload_url)
         owner_id, photo_id = save_img_to_vk(vk_token, vk_group_id, server, photo_url, img_hash)
         make_wall_post_vk(vk_token, vk_group_id, owner_id, photo_id, comic_commentary)
+    except (VkApiError, HTTPError, ConnectionError) as err:
+        logging.error(err, exc_info=True)
     finally:
         os.remove("image.png")
+
+
+if __name__ == "__main__":
+    main()
+
