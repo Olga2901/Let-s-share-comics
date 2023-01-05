@@ -4,7 +4,7 @@ import os
 from random import randint
 
 
-def get_random_url_xkcd():
+def download_random_comic():
     randon_num = randint(1, 2719)
     xkcd_url = f"https://xkcd.com/{randon_num}/info.0.json"
     response = requests.get(xkcd_url)
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     load_dotenv()
     vk_token = os.getenv("VK_TOKEN")
     vk_group_id = os.getenv("VK_GROUP_ID")
-    comic_commentary = get_random_url_xkcd()
+    comic_commentary = download_random_comic()
     upload_url = get_address_for_upload_img(vk_token, vk_group_id)
     server, photo_url, img_hash = upload_img_to_server(upload_url)
     owner_id, photo_id = save_img_to_vk(vk_token, vk_group_id, server, photo_url, img_hash)
