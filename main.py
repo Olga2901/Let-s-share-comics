@@ -51,7 +51,7 @@ def get_address_for_upload_img(vk_token, vk_group_id):
 
 
 def upload_img_to_server(upload_url):
-    with open("image.png","rb") as img_path:
+    with open("image.png", "rb") as img_path:
         files = {"photo": img_path}
         response = requests.post(upload_url, files=files)
     response.raise_for_status()
@@ -112,4 +112,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
