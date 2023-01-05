@@ -38,7 +38,7 @@ def upload_img_to_server(upload_url):
     return upload_url_response["server"], upload_url_response["photo"], upload_url_response["hash"] 
 
 
-def save_img_to_vk(vk_token, vk_group_id, server, photo_url, hash):
+def save_img_to_vk(vk_token, vk_group_id, server, photo_url, img_hash):
     photos_save_url = "https://api.vk.com/method/photos.saveWallPhoto"
     params = {
         "access_token": vk_token,
@@ -46,7 +46,7 @@ def save_img_to_vk(vk_token, vk_group_id, server, photo_url, hash):
         "group_id": vk_group_id,
         "photo": photo_url,
         "server": server,
-        "hash": hash,
+        "hash": img_hash,
     }
     response = requests.post(photos_save_url, params=params)
     response.raise_for_status()
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     vk_group_id = os.getenv("VK_GROUP_ID")
     comic_commentary = get_random_url_xkcd()
     upload_url = get_address_for_upload_img(vk_token, vk_group_id)
-    server, photo_url, hash = upload_img_to_server(upload_url)
-    owner_id, photo_id = save_img_to_vk(vk_token, vk_group_id, server, photo_url, hash)
+    server, photo_url, img_hash = upload_img_to_server(upload_url)
+    owner_id, photo_id = save_img_to_vk(vk_token, vk_group_id, server, photo_url, img_hash)
     make_wall_post_vk(vk_token, vk_group_id, owner_id, photo_id, comic_commentary)
     os.remove("image.png")
