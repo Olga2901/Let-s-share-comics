@@ -4,8 +4,15 @@ import os
 from random import randint
 
 
-def download_random_comic():
-    randon_num = randint(1, 2719)
+def get_total_comics():
+    url = "https://xkcd.com/info.0.json"
+    response = requests.get(url)
+    response.raise_for_status()
+    return int(response.json()["num"])
+
+
+def download_random_comic(total_comics):
+    randon_num = randint(1, total_comics)
     xkcd_url = f"https://xkcd.com/{randon_num}/info.0.json"
     response = requests.get(xkcd_url)
     response.raise_for_status()
@@ -72,9 +79,11 @@ if __name__ == "__main__":
     load_dotenv()
     vk_token = os.getenv("VK_TOKEN")
     vk_group_id = os.getenv("VK_GROUP_ID")
-    comic_commentary = download_random_comic()
+    total_comics = get_total_comics()
+    comic_commentary = download_random_comic(total_comics)
     upload_url = get_address_for_upload_img(vk_token, vk_group_id)
     server, photo_url, img_hash = upload_img_to_server(upload_url)
     owner_id, photo_id = save_img_to_vk(vk_token, vk_group_id, server, photo_url, img_hash)
     make_wall_post_vk(vk_token, vk_group_id, owner_id, photo_id, comic_commentary)
     os.remove("image.png")
+
