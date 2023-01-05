@@ -34,7 +34,7 @@ pip install -r requirements.txt
   - необходимо убрать параметр `redirect_uri` у запроса на ключ, а в параметр scope указать через запятую, вот так: 
 
     ```
-    scope=photos, groups, wall и offline
+    scope=photos, groups, wall, offline
     ```
 
   * Токен выглядит как строка наподобие `533bacf01e1165b57531ad114461ae8736d6506a3`, 
@@ -47,8 +47,8 @@ pip install -r requirements.txt
 5. Полученные в предыдущем пункте переменные (access_token и group_id) необходимо записать в созданный в корне проекта файл ``.env`` следующим образом:
 
 ```
-ACCESS_TOKEN=v1.a.136791528.bb7d... 
-GROUP_ID=9926
+VK_TOKEN=v1.a.136791528.bb7d... 
+VK_GROUP_ID=9926..
 
 ``` 
 ___
