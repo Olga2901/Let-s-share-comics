@@ -17,12 +17,11 @@ def get_random_url_xkcd():
     return response["alt"]
 
 
-def get_address_for_upload_img(vk_token, vk_group_id, vk_user_id):
+def get_address_for_upload_img(vk_token, vk_group_id):
     photos_wall_url = "https://api.vk.com/method/photos.getWallUploadServer"
     params = {
         "access_token": vk_token,
         "v": "5.131",
-        "user_id": vk_user_id,
         "group_id": vk_group_id,
     }
     response = requests.get(photos_wall_url, params=params)
@@ -39,12 +38,11 @@ def upload_img_to_server(upload_url):
     return upload_url_response["server"], upload_url_response["photo"], upload_url_response["hash"] 
 
 
-def save_img_to_vk(vk_token, vk_user_id, vk_group_id, server, photo_url, hash):
+def save_img_to_vk(vk_token, vk_group_id, server, photo_url, hash):
     photos_save_url = "https://api.vk.com/method/photos.saveWallPhoto"
     params = {
         "access_token": vk_token,
         "v": "5.131",
-        "user_id": vk_user_id,
         "group_id": vk_group_id,
         "photo": photo_url,
         "server": server,
@@ -73,15 +71,10 @@ def make_wall_post_vk(vk_token, vk_group_id, owner_id, photo_id, comic_commentar
 if __name__ == "__main__":
     load_dotenv()
     vk_token = os.getenv("VK_TOKEN")
-    vk_user_id = os.getenv("VK_USER_ID")
     vk_group_id = os.getenv("VK_GROUP_ID")
-    get_random_url_xkcd()
     comic_commentary = get_random_url_xkcd()
-    get_address_for_upload_img(vk_token, vk_group_id, vk_user_id)
-    upload_url = get_address_for_upload_img(vk_token, vk_group_id, vk_user_id)
-    upload_img_to_server(upload_url)
+    upload_url = get_address_for_upload_img(vk_token, vk_group_id)
     server, photo_url, hash = upload_img_to_server(upload_url)
-    save_img_to_vk(vk_token, vk_user_id, vk_group_id, server, photo_url, hash)
-    owner_id, photo_id = save_img_to_vk(vk_token, vk_user_id, vk_group_id, server, photo_url, hash)
+    owner_id, photo_id = save_img_to_vk(vk_token, vk_group_id, server, photo_url, hash)
     make_wall_post_vk(vk_token, vk_group_id, owner_id, photo_id, comic_commentary)
     os.remove("image.png")
